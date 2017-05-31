@@ -1,0 +1,44 @@
+{
+    "All":
+    {
+        "seed": 12345,
+        "time_stamp_tolerance": 0.01,
+        "prefix": null,
+        "write_report": true,
+        "report_file": "./report.json",
+        "overwrite_files": false,
+        "flush_report_interval": null
+    },
+    "Env":
+    {
+        "env": "MountainCar-v0",
+        "initial_reward": null,
+        "final_reward": null,
+        "min_reward": -1.0,
+        "max_reward": 1.0,
+        "render": true,
+        "monitor": false,
+        "monitor_dir": "./experiment-0/",
+        "monitor_args": {}
+    },
+    "EnvRunner":
+    {
+        "update_interval": 0.02,
+        "inter_trial_duration": 0.4
+    },
+    "CommandReceiver":
+    {
+        "socket": 5555,
+        "time_stamp_tolerance": 0.01
+    },
+    "ObservationSender":
+    {
+        "socket": 5556,
+        "update_interval": 0.01
+    },
+    "RewardSender":
+    {
+        "socket": 5557,
+        "update_interval": 0.01
+    }
+}
