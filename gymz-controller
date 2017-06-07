@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 """
@@ -22,22 +23,16 @@ import signal
 import threading
 import time
 
-import misc
-from zmq_reward_sender_thread import ZMQRewardSenderThread
-from zmq_observation_sender_thread import ZMQObservationSenderThread
-from zmq_command_receiver_thread import ZMQCommandReceiverThread
-from env_runner_thread import EnvRunnerThread
-from gym_wrapper import GymWrapper
+import gymz.misc
 
 
 def run(args):
     # Load default configuration file
-    with open('./DefaultConfig.json', 'r') as f:
-        config = json.load(f)
+    config = gymz.misc.read_default_config()
 
     # Parse user config file and update config
     with open(args['<config>'], 'r') as f:
-        misc.recursively_update_dict(config, json.load(f))
+        gymz.misc.recursively_update_dict(config, json.load(f))
 
     # Set prefix
     if config['All']['prefix'] is None:
@@ -45,7 +40,7 @@ def run(args):
 
     # Create wrapper instance
     if args['<emu>'] == 'gym':
-        emu = GymWrapper(config)
+        emu = gymz.GymWrapper(config)
     else:
         raise NotImplementedError('Unknown emulator.')
 
@@ -68,14 +63,14 @@ def run(args):
     done_buffer = emu.get_done_buffer()
     exit_event = threading.Event()
 
-    runner_thread = EnvRunnerThread(0, 'runner_thread', emu, command_buffer, output_buffer, reward_buffer, config, exit_event)
-    zmq_reward_sender_thread = ZMQRewardSenderThread(1, 'zmq_reward_sender_thread', reward_buffer, done_buffer, config, exit_event)
-    zmq_sender_thread = ZMQObservationSenderThread(2, 'zmq_sender_thread', output_buffer, done_buffer, config, exit_event)
-    zmq_receiver_thread = ZMQCommandReceiverThread(3, 'zmq_receiver_thread', command_buffer, done_buffer, config, exit_event)
+    runner_thread = gymz.EnvRunnerThread(0, 'runner_thread', emu, command_buffer, output_buffer, reward_buffer, config, exit_event)
+    zmq_reward_sender_thread = gymz.ZMQRewardSenderThread(1, 'zmq_reward_sender_thread', reward_buffer, done_buffer, config, exit_event)
+    zmq_sender_thread = gymz.ZMQObservationSenderThread(2, 'zmq_sender_thread', output_buffer, done_buffer, config, exit_event)
+    zmq_receiver_thread = gymz.ZMQCommandReceiverThread(3, 'zmq_receiver_thread', command_buffer, done_buffer, config, exit_event)
 
     # Set up signal handler for SIGINT to let all threads exit
     # gracefully
-    signal.signal(signal.SIGINT, misc.SignalHandler(
+    signal.signal(signal.SIGINT, gymz.misc.SignalHandler(
         exit_event, [runner_thread, zmq_reward_sender_thread, zmq_sender_thread, zmq_receiver_thread]))
 
     # Fire up the threads, they will not terminate unti SIGINT is received
