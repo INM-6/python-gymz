@@ -1,8 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import collections
+import json
+import os
 import sys
 import time
+
+
+def read_default_config():
+    """Reads the default configuration file"""
+    with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../DefaultConfig.json'), 'r') as f:
+        return json.load(f)
 
 
 def recursively_update_dict(d, u):
@@ -17,6 +25,7 @@ def recursively_update_dict(d, u):
 
 
 def sleep_remaining(t_start, t_total, msg=''):
+    """Sleeps the remaining time from now to t_start + t_total"""
     t_end = time.time()
     if t_total > (t_end - t_start):
         time.sleep(t_total - (t_end - t_start))
