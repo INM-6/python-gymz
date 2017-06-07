@@ -21,7 +21,7 @@ pip install gymz
 ```
 
 ## Quickstart
-An example client is provided (`examples/random_zmq_client.py`) that connects to a running instance of the wrapper, sends random actions and prints observations and rewards received from the environment to the screen. From a terminal start the wrapper with the default configuration file:
+An example client is provided (`examples/random_gymz_client.py`) that connects to a running instance of the wrapper, sends random actions and prints observations and rewards received from the environment to the screen. From a terminal start the wrapper with the default configuration file:
 
 ```bash
 gymz-controller gym DefaultConfig.json
@@ -30,7 +30,7 @@ gymz-controller gym DefaultConfig.json
 and the `MountainCar-v0` environment should be rendered on the screen. Afterwards start the client with:
 
 ```bash
-python random_zmq_client.py
+python random_gymz_client.py
 ```
 
 The client should now continously print commands, observations and rewards to the terminal. If it does not, please report the issue.
