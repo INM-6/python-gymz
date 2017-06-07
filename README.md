@@ -2,7 +2,7 @@
 [![Python2.7](https://img.shields.io/badge/python-2.7-blue.svg)](https://www.python.org/)
 [![License](http://img.shields.io/:license-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-gymz provides a light-weight wrapper around the [OpenAI Gym](https://gym.openai.com/) to allow interaction with reinforcement learning environments via [ZeroMQ](http://zeromq.org/) sockets.
+gymz provides a light-weight wrapper for the [OpenAI Gym](https://gym.openai.com/) to allow interaction with reinforcement-learning environments via [ZeroMQ](http://zeromq.org/) sockets.
 
 The wrapper consists of four different threads that coordinate
 
@@ -34,3 +34,6 @@ python random_zmq_client.py
 ```
 
 The client should now continously print commands, observations and rewards to the terminal. If it does not, please report the issue.
+
+## Code status
+gymz is in a fairly early development stage and should be used with care. Please report any unexpected behaviour you encounter and do not hesitate to create PRs.
