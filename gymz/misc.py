@@ -9,7 +9,7 @@ import time
 
 def read_default_config():
     """Reads the default configuration file"""
-    with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), '../DefaultConfig.json'), 'r') as f:
+    with open(os.path.join(os.path.abspath(os.path.dirname(__file__)), 'DefaultConfig.json'), 'r') as f:
         return json.load(f)
 
 

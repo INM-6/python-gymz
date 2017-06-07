@@ -7,13 +7,14 @@ setup(
     author='Jakob Jordan, Philipp Weidel',
     author_email='j.jordan@fz-juelich.de',
     description=('A light-weight ZeroMQ wrapper for the OpenAI Gym.'),
-    long_description=open('README.md').read(),
     license='MIT',
     keywords='openai-gym reinforcement-learning zeromq zmq',
     url='https://github.com/INM-6/python-gymz',
     packages=['gymz'],
+    package_data={
+        'gymz': ['DefaultConfig.json']
+    },
     scripts=['gymz-controller'],
-    data_files=[('', ['DefaultConfig.json'])],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: MIT License',
