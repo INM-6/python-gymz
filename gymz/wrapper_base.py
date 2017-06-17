@@ -10,6 +10,10 @@ class WrapperBase(object):
         self._reward_buffer = None
         self._done_buffer = None
 
+        self._gym = None
+        self._output = None
+        self._reward = None
+
     def get_done_buffer(self):
         if self._done_buffer is None:
             self._done_buffer = [False]

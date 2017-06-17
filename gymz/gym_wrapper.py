@@ -17,9 +17,6 @@ class GymWrapper(WrapperBase):
     def __init__(self, config):
         WrapperBase.__init__(self)
 
-        self._gym = None
-        self._output = None
-
         self._initial_reward = config['Env']['initial_reward']
         try:
             self._final_reward = config['Env']['final_reward']
@@ -45,15 +42,15 @@ class GymWrapper(WrapperBase):
             self._monitor_dir = os.path.join(config['All']['prefix'], config['Env']['monitor_dir'])
 
     def seed(self, seed):
-        self._gym.seed(seed)
+        self._env.seed(seed)
 
     def load_env(self, env, monitor_args, *args, **kwargs):
-        self._gym = gym.make(env, *args, **kwargs)
+        self._env = gym.make(env, *args, **kwargs)
         if self._monitor:
-            self._gym = gym.wrappers.Monitor(self._gym, self._monitor_dir, **monitor_args)
+            self._env = gym.wrappers.Monitor(self._env, self._monitor_dir, **monitor_args)
 
     def reset(self):
-        self._output = self._gym.reset()  # reset returns initial state
+        self._output = self._env.reset()  # reset returns initial state
         self._reward = self._initial_reward  # initial reward is assumed to be zero (by Gym)
         self._done_buffer[0] = False
 
@@ -64,17 +61,17 @@ class GymWrapper(WrapperBase):
         self._episode_time_start = time.time()
 
     def execute_action(self):
-        action_space = self._gym.action_space
+        action_space = self._env.action_space
         if isinstance(action_space, gym.spaces.Discrete):
             action = self._command_buffer[0][0]['value']
         else:
             action = [self._command_buffer[0][0]['value']]
 
-        self._output, self._reward, self._done_buffer[0], _ = self._gym.step(action)
+        self._output, self._reward, self._done_buffer[0], _ = self._env.step(action)
 
-        if isinstance(self._gym.observation_space, gym.spaces.Discrete):
+        if isinstance(self._env.observation_space, gym.spaces.Discrete):
             self._episode_observation.append(self._output)
-        elif isinstance(self._gym.observation_space, gym.spaces.Box):
+        elif isinstance(self._env.observation_space, gym.spaces.Box):
             self._episode_observation.append(list(self._output))
         else:
             raise NotImplementedError('execute_action')
@@ -90,7 +87,7 @@ class GymWrapper(WrapperBase):
         self._episode_reward.append(self._reward)
 
         if self._render:
-            self._gym.render()
+            self._env.render()
 
         print action, '->', self._output, self._reward, self._done_buffer[0]
 
@@ -100,16 +97,16 @@ class GymWrapper(WrapperBase):
 
     def update_output_buffer(self):
         assert(self._output_buffer is not None)
-        if isinstance(self._gym.observation_space, gym.spaces.Discrete):
+        if isinstance(self._env.observation_space, gym.spaces.Discrete):
             assert(not isinstance(self._output, (list, tuple, np.ndarray))), 'blasdasdghrghgh'
-            self._output_buffer[0] = [{'min': 0, 'max': self._gym.observation_space.n - 1, 'value': self._output}]
-        elif isinstance(self._gym.observation_space, gym.spaces.Box):
-            self._output_buffer[0] = [{'min': self._gym.observation_space.low[i], 'max': self._gym.observation_space.high[i], 'value': self._output[i]} for i in xrange(self._gym.observation_space.shape[0])]
+            self._output_buffer[0] = [{'min': 0, 'max': self._env.observation_space.n - 1, 'value': self._output}]
+        elif isinstance(self._env.observation_space, gym.spaces.Box):
+            self._output_buffer[0] = [{'min': self._env.observation_space.low[i], 'max': self._env.observation_space.high[i], 'value': self._output[i]} for i in xrange(self._env.observation_space.shape[0])]
         else:
             raise NotImplementedError('update_output_buffer')
 
     def get_command_buffer(self):
-        action_space = self._gym.action_space
+        action_space = self._env.action_space
         if self._command_buffer is None:
             if isinstance(action_space, gym.spaces.Discrete):
                 self._command_buffer = [[{'value': 0}]]
@@ -123,13 +120,13 @@ class GymWrapper(WrapperBase):
         return self._command_buffer
 
     def get_output_buffer(self):
-        observation_space = self._gym.observation_space
+        observation_space = self._env.observation_space
         if self._output_buffer is None:
             if isinstance(observation_space, gym.spaces.Discrete):
                 self._output_buffer = [[{'min': 0, 'max': observation_space.n - 1, 'value': 0}]]
             elif isinstance(observation_space, gym.spaces.Box):
                 assert(len(observation_space.shape) == 1), 'Not implemented for multiple dimensions.'
-                self._output_buffer = [[{'min': self._gym.observation_space.low[i], 'max': self._gym.observation_space.high[i], 'value': 0.} for i in xrange(self._gym.observation_space.shape[0])]]
+                self._output_buffer = [[{'min': self._env.observation_space.low[i], 'max': self._env.observation_space.high[i], 'value': 0.} for i in xrange(self._env.observation_space.shape[0])]]
             else:
                 raise NotImplementedError('Unknown observation space.')
         return self._output_buffer
@@ -141,10 +138,10 @@ class GymWrapper(WrapperBase):
 
     def clear_output_buffer(self):
         assert(self._output_buffer is not None)
-        if isinstance(self._gym.observation_space, gym.spaces.Discrete):
-            self._output_buffer[0] = [{'min': 0, 'max': self._gym.observation_space.n - 1, 'value': 5000}]
-        elif isinstance(self._gym.observation_space, gym.spaces.Box):
-            self._output_buffer[0] = [{'min': self._gym.observation_space.low[i], 'max': self._gym.observation_space.high[i], 'value': 5000.} for i in xrange(self._gym.observation_space.shape[0])]
+        if isinstance(self._env.observation_space, gym.spaces.Discrete):
+            self._output_buffer[0] = [{'min': 0, 'max': self._env.observation_space.n - 1, 'value': 5000}]
+        elif isinstance(self._env.observation_space, gym.spaces.Box):
+            self._output_buffer[0] = [{'min': self._env.observation_space.low[i], 'max': self._env.observation_space.high[i], 'value': 5000.} for i in xrange(self._env.observation_space.shape[0])]
         else:
             raise NotImplementedError('clear_output_buffer')
 
