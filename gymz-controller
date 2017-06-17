@@ -2,18 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Controller.
+gymz-controller.
 Start threads for running an environment in an emulator and expose
 input/output/reward buffers via ZeroMQ.
 
 Usage:
-    controller.py <emu> <config> [--directory <dir>] [--grayscale]
-    controller.py -h | --help
+    gymz-controller <emulator> <config>
+    gymz-controller -h | --help
+    gymz-controller --version
 
 Options:
-    -h --help         Show this screen
-    -d --directory    Directory with roms (required for ALE) [default: ./]
-    --grayscale       Convert 2d screens to grayscale to reduce output dimensions [default: False]
+    -h --help         Show this screen.
+    --version         Show version.
 """
 
 import docopt
@@ -23,10 +23,14 @@ import signal
 import threading
 import time
 
-import gymz.misc
+import gymz
 
 
 def run(args):
+    if args['--version']:
+        print 'gymz {version}'.format(version=gymz.__version__)
+        exit()
+
     # Load default configuration file
     config = gymz.misc.read_default_config()
 
@@ -34,12 +38,12 @@ def run(args):
     with open(args['<config>'], 'r') as f:
         gymz.misc.recursively_update_dict(config, json.load(f))
 
-    # Set prefix
+    # Set prefix (defaults to same directory as config)
     if config['All']['prefix'] is None:
         config['All']['prefix'] = os.path.split(args['<config>'])[0]
 
     # Create wrapper instance
-    if args['<emu>'] == 'gym':
+    if args['<emulator>'] == 'gym':
         emu = gymz.GymWrapper(config)
     else:
         raise NotImplementedError('Unknown emulator.')
@@ -47,11 +51,7 @@ def run(args):
     # Load an environment
     emu.load_env(config['Env']['env'], config['Env']['monitor_args'])
 
-    if args['--grayscale']:
-        # Set grayscale (use only for ATARI environments)
-        emu.to_grayscale(True)
-
-    # Fix random seed for reproducibility
+    # Set random seed if given
     if config['All']['seed'] >= 0:
         emu.seed(config['All']['seed'])
 
@@ -63,17 +63,18 @@ def run(args):
     done_buffer = emu.get_done_buffer()
     exit_event = threading.Event()
 
+    # Create thread objects
     runner_thread = gymz.EnvRunnerThread(0, 'runner_thread', emu, command_buffer, output_buffer, reward_buffer, config, exit_event)
     zmq_reward_sender_thread = gymz.ZMQRewardSenderThread(1, 'zmq_reward_sender_thread', reward_buffer, done_buffer, config, exit_event)
     zmq_sender_thread = gymz.ZMQObservationSenderThread(2, 'zmq_sender_thread', output_buffer, done_buffer, config, exit_event)
     zmq_receiver_thread = gymz.ZMQCommandReceiverThread(3, 'zmq_receiver_thread', command_buffer, done_buffer, config, exit_event)
 
     # Set up signal handler for SIGINT to let all threads exit
-    # gracefully
+    # gracefully if user wishes to exit
     signal.signal(signal.SIGINT, gymz.misc.SignalHandler(
         exit_event, [runner_thread, zmq_reward_sender_thread, zmq_sender_thread, zmq_receiver_thread]))
 
-    # Fire up the threads, they will not terminate unti SIGINT is received
+    # Fire up the threads, they will not terminate until SIGINT is received
     runner_thread.start()
     zmq_reward_sender_thread.start()
     zmq_sender_thread.start()
