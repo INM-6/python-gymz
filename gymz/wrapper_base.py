@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from . import messages
+
 
 class WrapperBase(object):
     """Base class for all wrappers"""
@@ -17,6 +19,8 @@ class WrapperBase(object):
         self._initial_reward = None
         self._min_reward = None
         self._max_reward = None
+
+        self._inter_trial_observation = None
 
     def done(self):
         return self._done_buffer[0]
@@ -44,7 +48,7 @@ class WrapperBase(object):
     def update_reward_buffer(self):
         """Updates reward buffer with current reward."""
         assert(self._reward_buffer is not None)
-        self._reward_buffer[0] = [{'min': self._min_reward, 'max': self._max_reward, 'value': self._reward}]
+        self._reward_buffer[0] = messages.to_message(self._min_reward, self._max_reward, self._reward)
 
     def get_command_buffer(self):
         """Initializes command buffer."""
@@ -63,7 +67,7 @@ class WrapperBase(object):
     def get_reward_buffer(self):
         """Initializes reward buffer."""
         if self._reward_buffer is None:
-            self._reward_buffer = [[{'min': self._min_reward, 'max': self._max_reward, 'value': self._initial_reward}]]
+            self._reward_buffer = [messages.to_message(self._min_reward, self._max_reward, self._initial_reward)]
         return self._reward_buffer
 
     def clear_output_buffer(self):
@@ -72,7 +76,7 @@ class WrapperBase(object):
 
     def clear_reward_buffer(self):
         """Replaces reward in reward buffer with user defined values."""
-        self._reward_buffer[0] = [{'min': self._min_reward, 'max': self._max_reward, 'value': self._initial_reward}]
+        self._reward_buffer[0] = messages.to_message(self._min_reward, self._max_reward, self._initial_reward)
 
     def report(self):
         """Writes a custom report."""

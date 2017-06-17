@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import numpy as np
 import os
 import time
 import warnings
@@ -8,7 +9,8 @@ import gym  # openai gym
 import gym.spaces
 import gym.wrappers
 
-from wrapper_base import WrapperBase
+from .wrapper_base import WrapperBase
+from . import messages
 
 
 class GymWrapper(WrapperBase):
@@ -29,6 +31,7 @@ class GymWrapper(WrapperBase):
 
         self._min_reward = config['Env']['min_reward']
         self._max_reward = config['Env']['max_reward']
+        self._inter_trial_observation = config['Env']['inter_trial_observation']
         self._render = config['Env']['render']
 
         self._episode = 0
@@ -109,9 +112,9 @@ class GymWrapper(WrapperBase):
 
         # handle Gym output depending on type of observation space
         if isinstance(self._env.observation_space, gym.spaces.Discrete):
-            self._output_buffer[0] = [{'min': 0, 'max': self._env.observation_space.n - 1, 'value': self._output}]
+            self._output_buffer[0] = messages.to_message(0, self._env.observation_space.n - 1, self._output)
         elif isinstance(self._env.observation_space, gym.spaces.Box):
-            self._output_buffer[0] = [{'min': self._env.observation_space.low[i], 'max': self._env.observation_space.high[i], 'value': self._output[i]} for i in xrange(self._env.observation_space.shape[0])]
+            self._output_buffer[0] = messages.to_message(self._env.observation_space.low, self._env.observation_space.high, self._output)
         else:
             raise NotImplementedError('Observation space {obs} not supported.'.format(obs=self._env.observation_space))
 
@@ -119,11 +122,9 @@ class GymWrapper(WrapperBase):
         if self._command_buffer is None:
             # set up buffer depending on type of action space
             if isinstance(self._env.action_space, gym.spaces.Discrete):
-                self._command_buffer = [[{'value': 0}]]
+                self._command_buffer = [messages.to_message(0, self._env.action_space.n - 1, 0)]
             elif isinstance(self._env.action_space, gym.spaces.Box) and len(self._env.action_space.shape) == 1:
-                self._command_buffer = [[]]
-                for i in xrange(self._env.action_space.shape[0]):
-                    self._command_buffer[0].append({'value': 0.})
+                self._command_buffer = [messages.to_message(self._env.action_space.low, self._env.action_space.high, 0.)]
             else:
                 raise NotImplementedError('Action space {acts} not supported.'.format(acts=self._env.action_space))
         return self._command_buffer
@@ -139,9 +140,11 @@ class GymWrapper(WrapperBase):
         assert(self._output_buffer is not None)
 
         if isinstance(self._env.observation_space, gym.spaces.Discrete):
-            self._output_buffer[0] = [{'min': 0, 'max': self._env.observation_space.n - 1, 'value': 5000.}]
+            self._output_buffer[0] = messages.to_message(0, self._env.observation_space.n - 1, self._inter_trial_observation)
         elif isinstance(self._env.observation_space, gym.spaces.Box) and len(self._env.observation_space.shape) == 1:
-            self._output_buffer[0] = [{'min': self._env.observation_space.low[i], 'max': self._env.observation_space.high[i], 'value': 5000.} for i in xrange(self._env.observation_space.shape[0])]
+            if np.shape(self._env.observation_space.low) != np.shape(self._inter_trial_observation):
+                raise ValueError('Dimensions of inter_trial_observation do not match environment.')
+            self._output_buffer[0] = messages.to_message(self._env.observation_space.low, self._env.observation_space.high, self._inter_trial_observation)
         else:
             raise NotImplementedError('Observation space {obs} not supported.'.format(obs=self._env.observation_space))
 
