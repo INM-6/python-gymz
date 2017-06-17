@@ -58,7 +58,7 @@ class GymWrapper(WrapperBase):
         self._env = gym.make(env, *args, **kwargs)
 
         if self._monitor:
-            self._env = gym.wrappers.Monitor(self._env, self._monitor_dir, monitor_args)
+            self._env = gym.wrappers.Monitor(self._env, self._monitor_dir, **monitor_args)
 
     def reset(self):
         self._output = self._env.reset()  # reset returns initial state
