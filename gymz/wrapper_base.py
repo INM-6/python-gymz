@@ -12,51 +12,68 @@ class WrapperBase(object):
 
         self._gym = None
         self._output = None
+
         self._reward = None
-
-    def get_done_buffer(self):
-        if self._done_buffer is None:
-            self._done_buffer = [False]
-        return self._done_buffer
-
-    def get_reward(self):
-        return self._reward
+        self._initial_reward = None
+        self._min_reward = None
+        self._max_reward = None
 
     def done(self):
         return self._done_buffer[0]
 
     def seed(self, seed):
+        """Sets random seed of environment."""
         raise NotImplementedError()
 
     def load_env(self, env, *args, **kwargs):
+        """Loads a specified environment."""
         raise NotImplementedError()
-
-    def get_output_dimensions(self, native=False):
-        raise NotImplementedError
 
     def reset(self):
+        """Resets environment to initial state."""
         raise NotImplementedError()
 
-    def execute_action(self, action):
+    def execute_action(self):
+        """Executes a single action in an environment."""
         raise NotImplementedError()
 
-    def update_output_buffer(self):
+    def update_output_buffer(self, data):
+        """Updates output buffer with current observation."""
         raise NotImplementedError()
+
+    def update_reward_buffer(self):
+        """Updates reward buffer with current reward."""
+        assert(self._reward_buffer is not None)
+        self._reward_buffer[0] = [{'min': self._min_reward, 'max': self._max_reward, 'value': self._reward}]
 
     def get_command_buffer(self):
+        """Initializes command buffer."""
         raise NotImplementedError()
 
+    def get_done_buffer(self):
+        """Initializes buffer to signal end of episode."""
+        if self._done_buffer is None:
+            self._done_buffer = [False]
+        return self._done_buffer
+
     def get_output_buffer(self):
+        """Initializes output buffer."""
         raise NotImplementedError()
 
     def get_reward_buffer(self):
-        raise NotImplementedError()
+        """Initializes reward buffer."""
+        if self._reward_buffer is None:
+            self._reward_buffer = [[{'min': self._min_reward, 'max': self._max_reward, 'value': self._initial_reward}]]
+        return self._reward_buffer
 
     def clear_output_buffer(self):
+        """Replaces observations in output buffer with user defined values."""
         raise NotImplementedError()
 
     def clear_reward_buffer(self):
-        raise NotImplementedError()
+        """Replaces reward in reward buffer with user defined values."""
+        self._reward_buffer[0] = [{'min': self._min_reward, 'max': self._max_reward, 'value': self._initial_reward}]
 
     def report(self):
+        """Writes a custom report."""
         raise NotImplementedError()

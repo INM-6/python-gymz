@@ -49,7 +49,7 @@ def run(args):
         raise NotImplementedError('Unknown emulator.')
 
     # Load an environment
-    emu.load_env(config['Env']['env'], config['Env']['monitor_args'])
+    emu.load_env(config['Env']['env'], monitor_args=config['Env']['monitor_args'])
 
     # Set random seed if given
     if config['All']['seed'] >= 0:
