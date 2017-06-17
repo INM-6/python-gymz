@@ -2,13 +2,16 @@
 
 import threading
 import time
+import warnings
 import zmq
 
 
 class ZMQCommandReceiverThread(threading.Thread):
     """Receives command via zmq socket."""
+
     def __init__(self, thread_id, thread_name, command_buffer, done_buffer, config, exit_event):
         threading.Thread.__init__(self)
+
         self.thread_id = thread_id
         self.name = thread_name
         self.command_buffer = command_buffer
@@ -33,7 +36,7 @@ class ZMQCommandReceiverThread(threading.Thread):
         self.command_buffer[0] = self.command_socket.recv_json()
         ts = time.time()
         if abs(ts - self.command_buffer[0][0]['ts']) > self._time_stamp_tolerance:
-            print '[WARNING] CommandReceiverThread desynchronized.'
+            warnings.warn('CommandReceiverThread desynchronized.', RuntimeWarning)
 
     def run(self):
         while not self.exit_event.is_set():

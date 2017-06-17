@@ -4,11 +4,12 @@ import threading
 import time
 import zmq
 
-import misc
+from . import misc
 
 
 class ZMQRewardSenderThread(threading.Thread):
     """Sends rewards via zmq sockets."""
+
     def __init__(self, thread_id, thread_name, reward_buffer, done_buffer, config, exit_event):
         threading.Thread.__init__(self)
         self.thread_id = thread_id
@@ -39,7 +40,7 @@ class ZMQRewardSenderThread(threading.Thread):
         while not self.exit_event.is_set():
             t_start = time.time()
             self._send()
-            misc.sleep_remaining(t_start, self._update_inteval, "[WARNING] RewardSenderThread: sleep time negative")
+            misc.sleep_remaining(t_start, self._update_inteval, 'RewardSenderThread: sleep time negative')
         print '[INFO] RewardSenderThread shutting down.'
 
     def done(self):

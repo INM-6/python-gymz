@@ -4,8 +4,9 @@ import json
 import os
 import threading
 import time
+import warnings
 
-import misc
+from . import misc
 
 
 class EnvRunnerThread(threading.Thread):
@@ -28,13 +29,12 @@ class EnvRunnerThread(threading.Thread):
             self._flush_report_interval = config['All']['flush_report_interval']
 
             if os.path.isfile(self._report_file):  # file already exists
-                if config["All"]["overwrite_files"]:
-                    print "[Warning] Report file already exists. Truncating."
+                if config['All']['overwrite_files']:
+                    warnings.warn('Report file already exists. Truncating.', RuntimeWarning)
                     with open(self._report_file, 'w') as f:  # clear file
                         json.dump({}, f)
                 else:
-                    print "[Error] Report file already exists. Exiting."
-                    exit()
+                    raise IOError('Report file already exists. Exiting.')
         else:
             self._report_file = None
 
@@ -62,7 +62,7 @@ class EnvRunnerThread(threading.Thread):
             t_start = time.time()
 
             if self.emu.done():
-                print '[info] ######### >reset< ########'
+                print '[info] EnvRunnerThread: reset'
                 t_start_done = time.time()
 
                 if self._write_report and self._flush_report_interval is None:
@@ -75,7 +75,7 @@ class EnvRunnerThread(threading.Thread):
                 self.emu.clear_output_buffer()
                 self.emu.clear_reward_buffer()
                 misc.sleep_remaining(t_start_done, self._inter_trial_duration,
-                                     '[WARNING] ObservationSenderThread: inter trial sleep time negative')
+                                     'EnvRunnerThread: inter trial sleep time negative')
                 t_start = time.time()
 
                 # update buffers to reflect initial state of env
@@ -92,5 +92,5 @@ class EnvRunnerThread(threading.Thread):
                 self._report()
 
             misc.sleep_remaining(t_start, self._update_interval,
-                                 '[WARNING] ObservationSenderThread: sleep time negative')
+                                 'EnvRunnerThread: sleep time negative')
         print '[INFO] EnvRunnerThread shutting down.'

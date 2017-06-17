@@ -4,7 +4,7 @@ import threading
 import time
 import zmq
 
-import misc
+from . import misc
 
 
 class ZMQObservationSenderThread(threading.Thread):
@@ -39,7 +39,7 @@ class ZMQObservationSenderThread(threading.Thread):
         while not self.exit_event.is_set():
             t_start = time.time()
             self._send_output()
-            misc.sleep_remaining(t_start, self._update_interval, "[WARNING] ObservationSenderThread: sleep time negative")
+            misc.sleep_remaining(t_start, self._update_interval, 'ObservationSenderThread: sleep time negative')
         print '[INFO] ObservationSenderThread shutting down.'
 
     def done(self):

@@ -5,6 +5,7 @@ import json
 import os
 import sys
 import time
+import warnings
 
 
 def read_default_config():
@@ -25,12 +26,14 @@ def recursively_update_dict(d, u):
 
 
 def sleep_remaining(t_start, t_total, msg=''):
-    """Sleeps the remaining time from now to t_start + t_total"""
+    """Sleeps the remaining time from now to t_start + t_total."""
     t_end = time.time()
     if t_total > (t_end - t_start):
         time.sleep(t_total - (t_end - t_start))
     else:
-        print msg
+        with warnings.catch_warnings():
+            warnings.simplefilter('always')  # always show desyncing warnings
+            warnings.warn(msg, RuntimeWarning)
 
 
 class SignalHandler(object):
