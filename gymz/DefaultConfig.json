@@ -14,6 +14,7 @@
         "env": "MountainCar-v0",
         "initial_reward": null,
         "final_reward": null,
+        "final_reward_null": null,
         "min_reward": -1.0,
         "max_reward": 1.0,
         "inter_trial_observation": [9999.0, 9999.0],

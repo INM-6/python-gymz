@@ -56,9 +56,24 @@ class GymWrapper(WrapperBase):
                 warnings.warn('Monitoring not enabled but passing monitor arguments.', RuntimeWarning)
 
         self._env = gym.make(env, *args, **kwargs)
+        self._check_parameters()
 
         if self._monitor:
             self._env = gym.wrappers.Monitor(self._env, self._monitor_dir, **monitor_args)
+
+    def _check_parameters(self):
+        if self._min_reward is not None and np.shape(self._min_reward) != ():
+            raise ValueError('min_reward needs to be one dimensional. Please adjust your config.')
+        if self._max_reward is not None and np.shape(self._max_reward) != ():
+            raise ValueError('max_reward needs to be one dimensional. Please adjust your config.')
+        if self._initial_reward is not None and np.shape(self._initial_reward) != ():
+            raise ValueError('initial_reward needs to be one dimensional. Please adjust your config.')
+        if self._final_reward is not None and np.shape(self._final_reward) != ():
+            raise ValueError('final_reward needs to be one dimensional. Please adjust your config.')
+        if self._final_reward_null is not None and np.shape(self._final_reward_null) != ():
+            raise ValueError('final_reward_null needs to be one dimensional. Please adjust your config.')
+        if np.shape(self._inter_trial_observation) != np.shape(self._env.observation_space.sample()):
+            raise ValueError('inter_trial_observation has different dimensions than the obervation space. Please adjust your config.')
 
     def reset(self):
         self._output = self._env.reset()  # reset returns initial state
