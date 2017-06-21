@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
+import re
 from setuptools import setup
+
+# determine version from __init__.py without importing it
+with open('./gymz/__init__.py', 'r') as f:
+    for l in f:
+        print l
+        if '__version__' in l:
+            try:
+                version = re.compile('[0-9]+.[0-9]+.[0-9]+').search(l).group()
+            except AttributeError:
+                raise ValueError('Could not determine package version.')
+            else:
+                break
 
 setup(
     name='gymz',
-    version='0.0.1',
+    version=version,
     author='Jakob Jordan, Philipp Weidel',
     author_email='j.jordan@fz-juelich.de',
     description=('A light-weight ZeroMQ wrapper for the OpenAI Gym.'),
