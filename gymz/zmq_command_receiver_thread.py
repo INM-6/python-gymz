@@ -29,7 +29,7 @@ class ZMQCommandReceiverThread(threading.Thread):
         self.command_socket = self.context.socket(zmq.SUB)
         self.command_socket.RCVTIMEO = 1000  # set timeout to allow for checking exit event
         self.command_socket.connect('tcp://localhost:{socket}'.format(socket=self._socket))
-        self.command_socket.setsockopt(zmq.SUBSCRIBE, "")
+        self.command_socket.setsockopt(zmq.SUBSCRIBE, b'')
 
     def _recv_command(self):
         """Receives a command via zmq and updates the command buffer"""
@@ -46,7 +46,7 @@ class ZMQCommandReceiverThread(threading.Thread):
                 self._recv_command()
             except:
                 pass
-        print '[INFO] CommandReceiverThread shutting down.'
+        print('[INFO] CommandReceiverThread shutting down.')
 
     def done(self):
         return self.done_buffer[0]
