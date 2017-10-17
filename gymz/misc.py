@@ -16,7 +16,7 @@ def read_default_config():
 
 def recursively_update_dict(d, u):
     """Updates dict d with dict u recursively."""
-    for k, v in u.iteritems():
+    for k, v in u.items():
         if isinstance(v, collections.Mapping):
             r = recursively_update_dict(d.get(k, {}), v)
             d[k] = r

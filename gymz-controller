@@ -28,7 +28,7 @@ import gymz
 
 def run(args):
     if args['--version']:
-        print 'gymz {version}'.format(version=gymz.__version__)
+        print('gymz {version}'.format(version=gymz.__version__))
         exit()
 
     # Load default configuration file

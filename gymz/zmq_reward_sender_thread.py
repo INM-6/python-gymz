@@ -41,7 +41,7 @@ class ZMQRewardSenderThread(threading.Thread):
             t_start = time.time()
             self._send()
             misc.sleep_remaining(t_start, self._update_inteval, 'RewardSenderThread: sleep time negative')
-        print '[INFO] RewardSenderThread shutting down.'
+        print('[INFO] RewardSenderThread shutting down.')
 
     def done(self):
         return self.done_buffer[0]

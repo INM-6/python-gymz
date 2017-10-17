@@ -62,7 +62,7 @@ class EnvRunnerThread(threading.Thread):
             t_start = time.time()
 
             if self.emu.done():
-                print '[info] EnvRunnerThread: reset'
+                print('[info] EnvRunnerThread: reset')
                 t_start_done = time.time()
 
                 if self._write_report and self._flush_report_interval is None:
@@ -93,4 +93,4 @@ class EnvRunnerThread(threading.Thread):
 
             misc.sleep_remaining(t_start, self._update_interval,
                                  'EnvRunnerThread: sleep time negative')
-        print '[INFO] EnvRunnerThread shutting down.'
+        print('[INFO] EnvRunnerThread shutting down.')
