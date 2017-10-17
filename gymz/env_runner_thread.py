@@ -23,6 +23,9 @@ class EnvRunnerThread(threading.Thread):
         self.exit_event = exit_event
         self._update_interval = config['EnvRunner']['update_interval']  # (s), update interval of ZMQ sockets
         self._inter_trial_duration = config['EnvRunner']['inter_trial_duration']  # (s), duration of no input/no reward state after reset of environment
+        self._init_reporting(config)
+
+    def _init_reporting(self, config):
         self._write_report = config['All']['write_report']
         if self._write_report:
             self._report_file = os.path.join(config['All']['prefix'], config['All']['report_file'])
@@ -35,6 +38,10 @@ class EnvRunnerThread(threading.Thread):
                         json.dump({}, f)
                 else:
                     raise IOError('Report file already exists. Exiting.')
+            else:
+                if not os.path.isdir(config['All']['prefix']):  # create directory if not existing
+                    os.makedirs(config['All']['prefix'])
+
         else:
             self._report_file = None
 
