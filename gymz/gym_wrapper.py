@@ -73,7 +73,7 @@ class GymWrapper(WrapperBase):
         if self._final_reward_null is not None and np.shape(self._final_reward_null) != ():
             raise ValueError('final_reward_null needs to be one dimensional. Please adjust your config.')
         if np.shape(self._inter_trial_observation) != np.shape(self._env.observation_space.sample()):
-            raise ValueError('inter_trial_observation is {} dimensional while the obervation space is {} dimensional. These need to be equal. Please adjust your config.'.format(len(np.shape(self._inter_trial_observation)), len(np.shape(self._env.observation_space.sample()))))
+            raise ValueError('inter_trial_observation has shape {} while the obervation space has shape {}. These need to be equal. Please adjust your config.'.format(np.shape(self._inter_trial_observation), np.shape(self._env.observation_space.sample())))
 
     def reset(self):
         self._output = self._env.reset()  # reset returns initial state
