@@ -1,10 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import threading
 import time
 import zmq
 
 from . import misc
+
+logger = logging.getLogger(__name__)
 
 
 class ZMQRewardSenderThread(threading.Thread):
@@ -40,8 +43,8 @@ class ZMQRewardSenderThread(threading.Thread):
         while not self.exit_event.is_set():
             t_start = time.time()
             self._send()
-            misc.sleep_remaining(t_start, self._update_inteval, 'RewardSenderThread: sleep time negative')
-        print('[INFO] RewardSenderThread shutting down.')
+            misc.sleep_remaining(t_start, self._update_inteval, 'sleep time negative', logger)
+        logger.info('shutting down')
 
     def done(self):
         return self.done_buffer[0]
