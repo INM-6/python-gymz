@@ -27,10 +27,6 @@ import gymz
 
 
 def run(args):
-    if args['--version']:
-        print('gymz {version}'.format(version=gymz.__version__))
-        exit()
-
     # Load default configuration file
     config = gymz.misc.read_default_config()
 
@@ -84,5 +80,6 @@ def run(args):
     while True:
         time.sleep(1000)
 
+
 if __name__ == '__main__':
-    run(docopt.docopt(__doc__))
+    run(docopt.docopt(__doc__, version=gymz.__version__))
