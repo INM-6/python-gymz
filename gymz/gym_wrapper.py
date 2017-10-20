@@ -139,9 +139,10 @@ class GymWrapper(WrapperBase):
             if isinstance(self._env.action_space, gym.spaces.Discrete):
                 self._command_buffer = [messages.to_message(0, self._env.action_space.n - 1, 0)]
             elif isinstance(self._env.action_space, gym.spaces.Box) and len(self._env.action_space.shape) == 1:
-                self._command_buffer = [messages.to_message(self._env.action_space.low, self._env.action_space.high, 0.)]
+                self._command_buffer = [messages.to_message(self._env.action_space.low[0], self._env.action_space.high[0], 0.)]
             else:
                 raise NotImplementedError('Action space {acts} not supported.'.format(acts=self._env.action_space))
+
         return self._command_buffer
 
     def get_output_buffer(self):
