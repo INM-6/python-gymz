@@ -7,17 +7,19 @@ Start threads for running an environment in an emulator and expose
 input/output/reward buffers via ZeroMQ.
 
 Usage:
-    gymz-controller <emulator> <config>
+    gymz-controller <emulator> <config> [--verbosity VERBOSITY]
     gymz-controller -h | --help
     gymz-controller --version
 
 Options:
     -h --help         Show this screen.
     --version         Show version.
+    -v --verbosity    Set logging verbosity level.
 """
 
 import docopt
 import json
+import logging
 import os
 import signal
 import threading
@@ -27,6 +29,13 @@ import gymz
 
 
 def run(args):
+
+    # set up logging
+    if args['--verbosity']:
+        logging.basicConfig(level=args['VERBOSITY'].upper())
+    else:
+        logging.basicConfig(level=logging.WARNING)
+
     # Load default configuration file
     config = gymz.misc.read_default_config()
 

@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import numpy as np
 import os
 import time
-import warnings
 
 import gym  # openai gym
 import gym.spaces
@@ -11,6 +11,8 @@ import gym.wrappers
 
 from .wrapper_base import WrapperBase
 from . import messages
+
+logger = logging.getLogger(__name__)
 
 
 class GymWrapper(WrapperBase):
@@ -53,7 +55,7 @@ class GymWrapper(WrapperBase):
             del kwargs['monitor_args']
 
             if not self._monitor and len(monitor_args) > 0:
-                warnings.warn('Monitoring not enabled but passing monitor arguments.', RuntimeWarning)
+                logger.warn('monitoring not enabled but passing monitor arguments')
 
         self._env = gym.make(env, *args, **kwargs)
         self._check_parameters()

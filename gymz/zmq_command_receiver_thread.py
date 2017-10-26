@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
+import logging
 import threading
 import time
-import warnings
 import zmq
+
+logger = logging.getLogger(__name__)
 
 
 class ZMQCommandReceiverThread(threading.Thread):
@@ -36,7 +38,7 @@ class ZMQCommandReceiverThread(threading.Thread):
         self.command_buffer[0] = self.command_socket.recv_json()
         ts = time.time()
         if abs(ts - self.command_buffer[0][0]['ts']) > self._time_stamp_tolerance:
-            warnings.warn('CommandReceiverThread desynchronized.', RuntimeWarning)
+            logger.warn('thread desynchronized')
 
     def run(self):
         while not self.exit_event.is_set():
@@ -46,7 +48,7 @@ class ZMQCommandReceiverThread(threading.Thread):
                 self._recv_command()
             except:
                 pass
-        print('[INFO] CommandReceiverThread shutting down.')
+        logger.info('shutting down')
 
     def done(self):
         return self.done_buffer[0]

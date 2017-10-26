@@ -2,10 +2,10 @@
 
 import collections
 import json
+import logging
 import os
 import sys
 import time
-import warnings
 
 
 def read_default_config():
@@ -25,15 +25,16 @@ def recursively_update_dict(d, u):
     return d
 
 
-def sleep_remaining(t_start, t_total, msg=''):
+def sleep_remaining(t_start, t_total, msg='', logger=None):
     """Sleeps the remaining time from now to t_start + t_total."""
     t_end = time.time()
     if t_total > (t_end - t_start):
         time.sleep(t_total - (t_end - t_start))
     else:
-        with warnings.catch_warnings():
-            warnings.simplefilter('always')  # always show desyncing warnings
-            warnings.warn(msg, RuntimeWarning)
+        if logger:
+            logger.warn(msg)
+        else:
+            logging.warn(msg)
 
 
 class SignalHandler(object):
@@ -54,6 +55,9 @@ class SignalHandler(object):
         # Wait for all threads to finish
         for thread in self.threads:
             thread.join()
+
+        # Shutdown logging
+        logging.shutdown()
 
         # And exit the program
         sys.exit(0)

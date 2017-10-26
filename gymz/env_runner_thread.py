@@ -1,12 +1,14 @@
 # -*- coding: utf-8 -*-
 
 import json
+import logging
 import os
 import threading
 import time
-import warnings
 
 from . import misc
+
+logger = logging.getLogger(__name__)
 
 
 class EnvRunnerThread(threading.Thread):
@@ -33,7 +35,7 @@ class EnvRunnerThread(threading.Thread):
 
             if os.path.isfile(self._report_file):  # file already exists
                 if config['All']['overwrite_files']:
-                    warnings.warn('Report file already exists. Truncating.', RuntimeWarning)
+                    logger.warn('report file already exists, truncating')
                     with open(self._report_file, 'w') as f:  # clear file
                         json.dump({}, f)
                 else:
@@ -69,7 +71,7 @@ class EnvRunnerThread(threading.Thread):
             t_start = time.time()
 
             if self.emu.done():
-                print('[info] EnvRunnerThread: reset')
+                logger.info('reset')
                 t_start_done = time.time()
 
                 if self._write_report and self._flush_report_interval is None:
@@ -82,7 +84,7 @@ class EnvRunnerThread(threading.Thread):
                 self.emu.clear_output_buffer()
                 self.emu.clear_reward_buffer()
                 misc.sleep_remaining(t_start_done, self._inter_trial_duration,
-                                     'EnvRunnerThread: inter trial sleep time negative')
+                                     'inter trial sleep time negative', logger)
                 t_start = time.time()
 
                 # update buffers to reflect initial state of env
@@ -99,5 +101,5 @@ class EnvRunnerThread(threading.Thread):
                 self._report()
 
             misc.sleep_remaining(t_start, self._update_interval,
-                                 'EnvRunnerThread: sleep time negative')
-        print('[INFO] EnvRunnerThread shutting down.')
+                                 'sleep time negative', logger)
+        logger.info('shutting down')
