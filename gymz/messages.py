@@ -24,7 +24,15 @@ def to_message(low, high, value):
         # serialized
         try:
             low = low.item()
+        except:
+            pass
+
+        try:
             high = high.item()
+        except:
+            pass
+
+        try:
             value = value.item()
         except:
             pass
