@@ -46,6 +46,31 @@ class GymWrapper(WrapperBase):
         if self._monitor:
             self._monitor_dir = os.path.join(config['All']['prefix'], config['Env']['monitor_dir'])
 
+        # set environment parameters
+
+        if 'env_params' in config['Env']:
+            logger.warn("changing environment properties")
+
+            # get env parameters
+            spec = gym.envs.registry.env_specs[config['Env']['env']]
+            del gym.envs.registry.env_specs[config['Env']['env']]
+
+            new_max_episode_steps = spec.max_episode_steps
+            if 'max_episode_steps' in config['Env']['env_params']:
+                new_max_episode_steps = config['Env']['env_params']['max_episode_steps']
+
+            new_kwargs = spec._kwargs
+            if 'kwargs' in config['Env']['env_params']:
+                new_kwargs.update(config['Env']['env_params']['kwargs'])
+
+            register_args = {"id": spec.id,
+                             "entry_point": spec._entry_point,
+                             "kwargs": new_kwargs,
+                             "max_episode_steps": new_max_episode_steps,
+                             "reward_threshold": spec.reward_threshold}
+
+            gym.envs.register(**register_args)
+
     def seed(self, seed):
         self._env.seed(seed)
 
