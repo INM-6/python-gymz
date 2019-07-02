@@ -17,7 +17,7 @@ setup(
     name='gymz',
     version=version,
     author='Jakob Jordan, Philipp Weidel',
-    author_email='j.jordan@fz-juelich.de',
+    author_email='jakobjordan@posteo.de',
     description=('A light-weight ZeroMQ wrapper for the OpenAI Gym.'),
     license='MIT',
     keywords='openai-gym reinforcement-learning zeromq zmq',

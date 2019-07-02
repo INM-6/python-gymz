@@ -1,7 +1,7 @@
 gymz
 ====
 
-|Python2.7| |License|
+|Python2.7| |Python3.6| |License|
 
 gymz provides a light-weight wrapper for the `OpenAI Gym <https://gym.openai.com/>`__ to allow interaction with reinforcement-learning environments via `ZeroMQ <http://zeromq.org/>`__ sockets.
 
@@ -46,6 +46,8 @@ Code status
 gymz is in a fairly early development stage and should be used with care. Please report any unexpected behaviour you encounter and do not hesitate to create PRs.
 
 .. |Python2.7| image:: https://img.shields.io/badge/python-2.7-blue.svg
+   :target: https://www.python.org/
+.. |Python3.6| image:: https://img.shields.io/badge/python-3.6-blue.svg
    :target: https://www.python.org/
 .. |License| image:: http://img.shields.io/:license-MIT-green.svg
    :target: https://opensource.org/licenses/MIT
